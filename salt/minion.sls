@@ -1,5 +1,7 @@
 {% from "salt/map.jinja" import salt_settings with context %}
 
+# Edits based on https://github.com/saltstack-formulas/salt-formula/issues/136
+
 salt-minion:
 {% if salt_settings.install_packages %}
   pkg.installed:
@@ -16,6 +18,10 @@ salt-minion:
   service.running:
     - enable: True
     - name: {{ salt_settings.minion_service }}
+    - require:
+      - pkg: salt-minion
+  cmd.wait:
+    - name: echo service salt-minion restart | at now + 1 minute
     - watch:
 {% if salt_settings.install_packages %}
       - pkg: salt-minion
